@@ -208,6 +208,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 const filterValue = ref('')
 
 function openColumnFilter(column) {
