@@ -35,6 +35,13 @@
         >
           <HeartIcon class="h-4 w-4" />
         </Button>
+        <Button
+          v-else
+          icon="filter"
+          variant="ghost"
+          class="ml-1"
+          @click="() => openColumnFilter(column)"
+        />
       </ListHeaderItem>
     </ListHeader>
     <ListRows
@@ -197,6 +204,17 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+const filterValue = ref('')
+
+function openColumnFilter(column) {
+  const value = prompt(`Enter filter value for ${column.label}`)
+  if (value !== null) {
+    list.value.params.filters = list.value.params.filters || {}
+    list.value.params.filters[column.key] = ['=', value]
+    list.value.fetch()
+  }
+}
 import HeartIcon from '@/components/Icons/HeartIcon.vue'
 import MultipleAvatar from '@/components/MultipleAvatar.vue'
 import IndicatorIcon from '@/components/Icons/IndicatorIcon.vue'

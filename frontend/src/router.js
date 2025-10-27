@@ -128,17 +128,22 @@ router.beforeEach(async (to, from, next) => {
 
       let defaultView = getDefaultView()
       const userRoles = userResource.data?.roles || []
+      console.log('[CRM DEBUG] userRoles:', userRoles)
+      console.log('[CRM DEBUG] defaultView:', defaultView)
       if (userRoles.includes('Dashboard Manager')) {
+        console.log('[CRM DEBUG] Redirecting to Dashboard')
         next({ name: 'Dashboard' })
         return
       }
       if (!defaultView) {
+        console.log('[CRM DEBUG] No defaultView, redirecting to Leads')
         next({ name: 'Leads' })
         return
       }
 
       let { route_name, type, name, is_standard } = defaultView
       route_name = route_name || 'Leads'
+      console.log('[CRM DEBUG] Redirecting to', route_name, type, name, is_standard)
 
       if (name && !is_standard) {
         next({ name: route_name, params: { viewType: type }, query: { view: name } })

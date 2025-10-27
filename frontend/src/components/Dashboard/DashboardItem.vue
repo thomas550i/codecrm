@@ -48,8 +48,9 @@ const props = defineProps({
 const router = useRouter()
 
 function openListWithFilter() {
+  console.log('[CRM DEBUG] Number card clicked:', props.item)
   if (props.item.type === 'number_chart' && props.item.data?.filter) {
-    // Example: open Leads list with filter
+    console.log('[CRM DEBUG] Navigating to list with filter:', props.item.data.listRoute, props.item.data.filter)
     router.push({
       name: props.item.data.listRoute || 'Leads', // or 'Deals', etc.
       query: { filter: JSON.stringify(props.item.data.filter) }
