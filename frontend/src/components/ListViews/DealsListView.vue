@@ -26,6 +26,7 @@
         :item="column"
         @columnWidthUpdated="emit('columnWidthUpdated', column)"
       >
+        <span class="font-medium mr-1">{{ column.label }}</span>
         <Button
           v-if="column.key == '_liked_by'"
           variant="ghosted"
@@ -42,6 +43,34 @@
           class="ml-1"
           @click="() => openColumnFilter(column)"
         />
+        <div
+          v-if="filterPopover.open && filterPopover.columnKey === column.key"
+          class="absolute z-10 bg-white border rounded shadow p-2 mt-2"
+        >
+          <input
+            v-model="filterPopover.value"
+            type="text"
+            class="border px-2 py-1 rounded w-32"
+            @keydown.enter="applyColumnFilter(column)"
+            placeholder="Filter..."
+          />
+          <Button
+            size="sm"
+            variant="primary"
+            class="ml-1"
+            @click="applyColumnFilter(column)"
+          >
+            Apply
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            class="ml-1"
+            @click="closeColumnFilter"
+          >
+            Cancel
+          </Button>
+        </div>
       </ListHeaderItem>
     </ListHeader>
     <ListRows
@@ -207,13 +236,21 @@
 import { ref } from 'vue'
 const filterValue = ref('')
 
+const filterPopover = ref({ open: false, columnKey: null, value: '' })
+
 function openColumnFilter(column) {
-  const value = prompt(`Enter filter value for ${column.label}`)
-  if (value !== null) {
+  filterPopover.value = { open: true, columnKey: column.key, value: '' }
+}
+function applyColumnFilter(column) {
+  if (filterPopover.value.value) {
     list.value.params.filters = list.value.params.filters || {}
-    list.value.params.filters[column.key] = ['=', value]
+    list.value.params.filters[column.key] = ['like', filterPopover.value.value]
     list.value.fetch()
   }
+  filterPopover.value = { open: false, columnKey: null, value: '' }
+}
+function closeColumnFilter() {
+  filterPopover.value = { open: false, columnKey: null, value: '' }
 }
 import HeartIcon from '@/components/Icons/HeartIcon.vue'
 import MultipleAvatar from '@/components/MultipleAvatar.vue'

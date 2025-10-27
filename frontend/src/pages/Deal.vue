@@ -495,7 +495,7 @@ const breadcrumbs = computed(() => {
 
   items.push({
     label: title.value +"'s Opportunity",
-    route: { name: 'Deal', params: { dealId: deal.data.name } },
+    route: { name: 'Deal', params: { dealId: dealId } },
   })
   return items
 })
