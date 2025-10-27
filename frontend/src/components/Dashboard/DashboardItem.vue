@@ -3,6 +3,7 @@
     <div
       v-if="item.type == 'number_chart'"
       class="flex h-full w-full rounded shadow overflow-hidden cursor-pointer"
+      @click="openListWithFilter"
     >
       <Tooltip :text="__(item.data.tooltip)">
         <NumberChart
@@ -36,19 +37,23 @@
 </template>
 <script setup>
 import { AxisChart, DonutChart, NumberChart, Tooltip } from 'frappe-ui'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
-  index: {
-    type: Number,
-    required: true,
-  },
-  item: {
-    type: Object,
-    required: true,
-  },
-  editing: {
-    type: Boolean,
-    default: false,
-  },
+  index: Number,
+  item: Object,
+  editing: Boolean,
 })
+
+const router = useRouter()
+
+function openListWithFilter() {
+  if (props.item.type === 'number_chart' && props.item.data?.filter) {
+    // Example: open Leads list with filter
+    router.push({
+      name: props.item.data.listRoute || 'Leads', // or 'Deals', etc.
+      query: { filter: JSON.stringify(props.item.data.filter) }
+    })
+  }
+}
 </script>

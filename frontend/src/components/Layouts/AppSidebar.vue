@@ -20,12 +20,17 @@
             <Badge
               v-if="!isSidebarCollapsed && unreadNotificationsCount"
               :label="unreadNotificationsCount"
-              variant="subtle"
+              theme="red"
+              size="md"
+              variant="solid"
+              class="animate-bounce shadow-lg text-white font-bold"
             />
             <div
               v-else-if="unreadNotificationsCount"
-              class="absolute -left-1.5 top-1 z-20 h-[5px] w-[5px] translate-x-6 translate-y-1 rounded-full bg-surface-gray-6 ring-1 ring-white"
-            />
+              class="absolute -left-1.5 top-1 z-20 h-5 w-5 flex items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold shadow-lg animate-bounce"
+            >
+              {{ unreadNotificationsCount }}
+            </div>
           </template>
         </SidebarLink>
       </div>

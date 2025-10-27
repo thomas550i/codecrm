@@ -126,20 +126,26 @@ router.beforeEach(async (to, from, next) => {
     const { views, getDefaultView } = viewsStore()
     await views.promise
 
-    let defaultView = getDefaultView()
-    if (!defaultView) {
-      next({ name: 'Leads' })
-      return
-    }
+      let defaultView = getDefaultView()
+      // Check for Dashboard Manager role
+      const userRoles = userResource.data?.roles || []
+      if (!defaultView) {
+        if (userRoles.includes('Dashboard Manager')) {
+          next({ name: 'Dashboard' })
+        } else {
+          next({ name: 'Leads' })
+        }
+        return
+      }
 
-    let { route_name, type, name, is_standard } = defaultView
-    route_name = route_name || 'Leads'
+      let { route_name, type, name, is_standard } = defaultView
+      route_name = route_name || (userRoles.includes('Dashboard Manager') ? 'Dashboard' : 'Leads')
 
-    if (name && !is_standard) {
-      next({ name: route_name, params: { viewType: type }, query: { view: name } })
-    } else {
-      next({ name: route_name, params: { viewType: type } })
-    }
+      if (name && !is_standard) {
+        next({ name: route_name, params: { viewType: type }, query: { view: name } })
+      } else {
+        next({ name: route_name, params: { viewType: type } })
+      }
   } else if (!isLoggedIn) {
     window.location.href = '/login?redirect-to=/crm'
   } else if (to.matched.length === 0) {
