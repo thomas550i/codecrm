@@ -1,5 +1,6 @@
 import LucideCheck from '~icons/lucide/check'
 import TaskStatusIcon from '@/components/Icons/TaskStatusIcon.vue'
+import OpportunityStatusIcon from '@/components/Icons/OpportunityStatusIcon.vue'
 import TaskPriorityIcon from '@/components/Icons/TaskPriorityIcon.vue'
 import { usersStore } from '@/stores/users'
 import { gemoji } from 'gemoji'
@@ -196,6 +197,24 @@ export function prettyDate(date, mini = false) {
   }
 }
 
+export function oppStatusOptions(action, data) {
+  let options = ['Open','Quote Sent','Won','Lost','Backlog']
+  let statusMeta = getMeta('CRM Opportunity')
+    .getFields()
+    ?.find((field) => field.fieldname == 'status')
+  if (statusMeta) {
+    options = statusMeta.options
+      .map((option) => option.value)
+      .filter((option) => option)
+  }
+  return options.map((status) => {
+    return {
+      icon: () => h(OpportunityStatusIcon, { status }),
+      label: status,
+      onClick: () => action && action(status, data),
+    }
+  })
+}
 export function taskStatusOptions(action, data) {
   let options = ['Backlog', 'Todo', 'In Progress', 'Done', 'Canceled']
   let statusMeta = getMeta('CRM Task')
