@@ -43,6 +43,18 @@ const routes = [
     props: true,
   },
   {
+    alias: '/opportunitys',
+    path: '/opportunity/view/:viewType?',
+    name: 'Opportunitys',
+    component: () => import('@/pages/Opportunitys.vue'),
+  },
+  {
+    path: '/opportunitys/:dealId',
+    name: 'Opportunity',
+    component: () => import(`@/pages/${handleMobileView('Opportunity')}.vue`),
+    props: true,
+  },
+  {
     alias: '/notes',
     path: '/notes/view/:viewType?',
     name: 'Notes',

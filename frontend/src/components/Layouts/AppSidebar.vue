@@ -209,9 +209,9 @@ const links = [
     to: 'Leads',
   },
   {
-    label: 'Deals',
+      label: 'Opportunity',
     icon: DealsIcon,
-    to: 'Deals',
+      to: { name: 'Deals', params: { viewType: 'kanban' } },
   },
   {
     label: 'Contacts',
@@ -543,6 +543,7 @@ const articles = ref([
     subArticles: [
       { name: 'lead', title: __('Lead') },
       { name: 'deal', title: __('Deal') },
+      { name: 'opportunity', title: __('Opportunity') },
       { name: 'contact', title: __('Contact') },
       { name: 'organization', title: __('Organization') },
       { name: 'note', title: __('Note') },

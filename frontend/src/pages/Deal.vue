@@ -476,7 +476,7 @@ const showFilesUploader = ref(false)
 const _organization = ref({})
 
 const breadcrumbs = computed(() => {
-  let items = [{ label: __('Deals'), route: { name: 'Deals' } }]
+  let items = [{ label: __('Opportunity'), route: { name: 'Deals' } }]
 
   if (route.query.view || route.query.viewType) {
     let view = getView(route.query.view, route.query.viewType, 'CRM Deal')
@@ -494,8 +494,8 @@ const breadcrumbs = computed(() => {
   }
 
   items.push({
-    label: title.value,
-    route: { name: 'Deal', params: { dealId: props.dealId } },
+    label: title.value +"'s Opportunity",
+    route: { name: 'Deal', params: { dealId: deal.data.name } },
   })
   return items
 })

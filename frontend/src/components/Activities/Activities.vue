@@ -68,6 +68,9 @@
       <div v-else-if="title == 'Tasks'" class="px-3 pb-3 sm:px-10 sm:pb-5">
         <TaskArea :modalRef="modalRef" :tasks="activities" :doctype="doctype" />
       </div>
+      <div v-else-if="title == 'Opportunity'" class="px-3 pb-3 sm:px-10 sm:pb-5">
+        <OpportunityArea :modalRef="modalRef" :tasks="activities" :doctype="doctype" />
+      </div>
       <div v-else-if="title == 'Calls'" class="activity">
         <div v-for="(call, i) in activities">
           <div
@@ -401,6 +404,11 @@
         @click="modalRef.showTask()"
       />
       <Button
+        v-else-if="title == 'Opportunity'"
+        :label="__('Create Opportunity')"
+        @click="modalRef.showOpp()"
+      />
+      <Button
         v-else-if="title == 'Attachments'"
         :label="__('Upload Attachment')"
         @click="showFilesUploader = true"
@@ -457,6 +465,7 @@ import CommentArea from '@/components/Activities/CommentArea.vue'
 import CallArea from '@/components/Activities/CallArea.vue'
 import NoteArea from '@/components/Activities/NoteArea.vue'
 import TaskArea from '@/components/Activities/TaskArea.vue'
+import OpportunityArea from '@/components/Activities/OpportunityArea.vue'
 import AttachmentArea from '@/components/Activities/AttachmentArea.vue'
 import DataFields from '@/components/Activities/DataFields.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
@@ -640,6 +649,9 @@ const activities = computed(() => {
   } else if (title.value == 'Tasks') {
     if (!all_activities.data?.tasks) return []
     return sortByModified(all_activities.data.tasks)
+  } else if (title.value == 'Opportunity') { 
+    if (!all_activities.data?.opportunity) return []
+    return sortByModified(all_activities.data.opportunity)
   } else if (title.value == 'Notes') {
     if (!all_activities.data?.notes) return []
     return sortByModified(all_activities.data.notes)
@@ -802,7 +814,7 @@ function scroll(hash) {
 const callActions = computed(() => {
   let actions = [
     {
-      label: __('Log a Call'),
+      label: __('Create Call Log'),
       onClick: () => modalRef.value.createCallLog(),
     },
     {

@@ -39,6 +39,15 @@
       iconLeft="plus"
       @click="modalRef.showTask()"
     />
+     <Button
+      v-else-if="title == 'Opportunity'"
+      variant="solid"
+      @click="modalRef.showOpp()"
+      :label="__('New Opportunity')"
+      iconLeft="plus"
+    >
+
+    </Button>
     <Button
       v-else-if="title == 'Attachments'"
       variant="solid"
@@ -103,6 +112,11 @@ const showFilesUploader = defineModel('showFilesUploader')
 const defaultActions = computed(() => {
   let actions = [
     {
+      icon: h(TaskIcon, { class: 'h-4 w-4' }),
+      label: __('New Opportunity'),
+      onClick: () => props.modalRef.showOpp(),
+    },
+    {
       icon: h(Email2Icon, { class: 'h-4 w-4' }),
       label: __('New Email'),
       onClick: () => (props.emailBox.show = true),
@@ -114,7 +128,7 @@ const defaultActions = computed(() => {
     },
     {
       icon: h(PhoneIcon, { class: 'h-4 w-4' }),
-      label: __('Log a Call'),
+      label: __('Create Call Log'),
       onClick: () => props.modalRef.createCallLog(),
     },
     {
@@ -157,7 +171,7 @@ function getTabIndex(name) {
 const callActions = computed(() => {
   let actions = [
     {
-      label: __('Log a Call'),
+      label: __('Create Call Log'),
       icon: 'plus',
       onClick: () => props.modalRef.createCallLog(),
     },

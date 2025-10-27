@@ -7,6 +7,14 @@
     :doc="doc?.name"
     @after="redirect('tasks')"
   />
+  <OpportunityModalUpdate
+    v-model="showOppModal"
+    v-model:reloadOpp="activities"
+    :oppdata="oppdata"
+    :doctype="'CRM Opportunity'"
+    :doc="doc.data?.name"
+    @after="redirect('opportunity')"
+  />
   <NoteModal
     v-model="showNoteModal"
     v-model:reloadNotes="activities"
@@ -27,6 +35,7 @@
 import TaskModal from '@/components/Modals/TaskModal.vue'
 import NoteModal from '@/components/Modals/NoteModal.vue'
 import CallLogModal from '@/components/Modals/CallLogModal.vue'
+import OpportunityModalUpdate from '@/components/Modals/OpportunityModalUpdate.vue'  
 import { call } from 'frappe-ui'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -40,7 +49,9 @@ const doc = defineModel('doc')
 
 // Tasks
 const showTaskModal = ref(false)
+const showOppModal = ref(false)
 const task = ref({})
+const oppdata = ref({})
 
 function showTask(t) {
   task.value = t || {
@@ -54,6 +65,16 @@ function showTask(t) {
   showTaskModal.value = true
 }
 
+function showOpp(t) {
+  oppdata.value = t || {
+    opportunity_for: '',
+    more_info: '',
+    assigned_to: '',
+    expected_closing_date: '',
+    status: 'Open',
+  }
+  showOppModal.value = true
+}
 async function deleteTask(name) {
   await call('frappe.client.delete', {
     doctype: 'CRM Task',
@@ -65,6 +86,16 @@ async function deleteTask(name) {
 function updateTaskStatus(status, task) {
   call('frappe.client.set_value', {
     doctype: 'CRM Task',
+    name: task.name,
+    fieldname: 'status',
+    value: status,
+  }).then(() => {
+    activities.value.reload()
+  })
+}
+function updateOppStatus(status, task) {
+  call('frappe.client.set_value', {
+    doctype: 'CRM Opportunity',
     name: task.name,
     fieldname: 'status',
     value: status,
@@ -116,8 +147,10 @@ function redirect(tabName) {
 
 defineExpose({
   showTask,
+  showOpp,
   deleteTask,
   updateTaskStatus,
+  updateOppStatus,
   showNote,
   createCallLog,
 })

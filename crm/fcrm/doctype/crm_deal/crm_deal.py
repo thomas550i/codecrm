@@ -51,9 +51,9 @@ class CRMDeal(Document):
 
 	def set_primary_email_mobile_no(self):
 		if not self.contacts:
-			self.email = ""
-			self.mobile_no = ""
-			self.phone = ""
+			# self.email = ""
+			# self.mobile_no = ""
+			# self.phone = ""
 			return
 
 		if len([contact for contact in self.contacts if contact.is_primary]) > 1:

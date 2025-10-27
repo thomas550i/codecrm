@@ -69,7 +69,59 @@
   "first_response_time",
   "first_responded_on",
   "log_tab",
-  "status_change_log"
+  "status_change_log",
+  "technical_specification_tab",
+  "elevator_details",
+  "quantity",
+  "shape",
+  "type",
+  "use",
+  "made_in",
+  "brand",
+  "column_break_qrgd",
+  "heading_vokz",
+  "floor_material",
+  "ceiling_material",
+  "ceiling_material_right",
+  "ceiling_material_rear",
+  "cabin_celling",
+  "cabin_handrail",
+  "cabin_hight",
+  "cabin_depth",
+  "cabin_width",
+  "cabin_color",
+  "section_break_rwel",
+  "door_details",
+  "control_system",
+  "door_hight",
+  "door_width",
+  "door_type",
+  "door_material",
+  "door_opening",
+  "cop",
+  "column_break_cvhm",
+  "shaft_details",
+  "shaft_width",
+  "shaft_depth",
+  "total_hight",
+  "floor_hight",
+  "shaft_pit",
+  "structure_type",
+  "structure_more_details",
+  "overhead",
+  "travel",
+  "section_break_caai",
+  "machine",
+  "machine_type",
+  "machine_brand",
+  "machine_power_supply",
+  "machine_speed",
+  "machine_person_capacity",
+  "machine_capacity_kg",
+  "macchine_control_system",
+  "stops__floors__entrance",
+  "machine_location",
+  "column_break_hxyp"
  ],
  "fields": [
   {
@@ -128,14 +180,12 @@
   {
    "fieldname": "email",
    "fieldtype": "Data",
-   "label": "Primary Email",
-   "options": "Email"
+   "label": "Email"
   },
   {
    "fieldname": "mobile_no",
    "fieldtype": "Data",
-   "label": "Primary Mobile No",
-   "options": "Phone"
+   "label": "Mobile No"
   },
   {
    "default": "Qualification",
@@ -249,7 +299,8 @@
    "fieldname": "phone",
    "fieldtype": "Data",
    "label": "Primary Phone",
-   "options": "Phone"
+   "options": "Phone",
+   "read_only": 1
   },
   {
    "fieldname": "log_tab",
@@ -427,13 +478,304 @@
    "fieldname": "closed_date",
    "fieldtype": "Date",
    "label": "Closed Date"
+  },
+  {
+   "fieldname": "technical_specification_tab",
+   "fieldtype": "Tab Break",
+   "label": "Technical specification"
+  },
+  {
+   "fieldname": "elevator_details",
+   "fieldtype": "Heading",
+   "label": "Elevator Details"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Link",
+   "label": "Quantity",
+   "options": "crm quantity"
+  },
+  {
+   "fieldname": "column_break_qrgd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "heading_vokz",
+   "fieldtype": "Heading",
+   "label": "Cabin Details"
+  },
+  {
+   "fieldname": "shape",
+   "fieldtype": "Link",
+   "label": "Shape",
+   "options": "CRM Shape"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Link",
+   "label": "Type",
+   "options": "CRM Elevator Type"
+  },
+  {
+   "fieldname": "use",
+   "fieldtype": "Link",
+   "label": "Use",
+   "options": "CRM Elevator Use"
+  },
+  {
+   "fieldname": "made_in",
+   "fieldtype": "Link",
+   "label": "Made in",
+   "options": "CRM Made In"
+  },
+  {
+   "fieldname": "brand",
+   "fieldtype": "Link",
+   "label": "Brand",
+   "options": "CRM  Brand"
+  },
+  {
+   "fieldname": "floor_material",
+   "fieldtype": "Link",
+   "label": "Floor Material",
+   "options": "CRM Floor Material"
+  },
+  {
+   "fieldname": "ceiling_material",
+   "fieldtype": "Link",
+   "label": "Cabin wall (left)",
+   "options": "CRM Ceiling Material"
+  },
+  {
+   "fieldname": "cabin_hight",
+   "fieldtype": "Link",
+   "label": "Cabin Hight",
+   "options": "CRM Cabin Hight"
+  },
+  {
+   "fieldname": "cabin_depth",
+   "fieldtype": "Link",
+   "label": "Cabin Depth",
+   "options": "CRM Cabin Depth"
+  },
+  {
+   "fieldname": "section_break_rwel",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "door_details",
+   "fieldtype": "Heading",
+   "label": "Door Details"
+  },
+  {
+   "fieldname": "control_system",
+   "fieldtype": "Link",
+   "label": "Control System",
+   "options": "CRM Door Control System"
+  },
+  {
+   "fieldname": "door_hight",
+   "fieldtype": "Link",
+   "label": "Door Hight",
+   "options": "CRM Door Hight"
+  },
+  {
+   "fieldname": "door_width",
+   "fieldtype": "Link",
+   "label": "Door width",
+   "options": "CRM Door width"
+  },
+  {
+   "fieldname": "door_type",
+   "fieldtype": "Link",
+   "label": "Door type",
+   "options": "CRM Door type"
+  },
+  {
+   "fieldname": "door_material",
+   "fieldtype": "Link",
+   "label": "Door Material",
+   "options": "CRM Door Material"
+  },
+  {
+   "fieldname": "column_break_cvhm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "shaft_details",
+   "fieldtype": "Heading",
+   "label": "Shaft Details"
+  },
+  {
+   "fieldname": "shaft_width",
+   "fieldtype": "Link",
+   "label": "Shaft Width",
+   "options": "CRM Shaft Width"
+  },
+  {
+   "fieldname": "shaft_depth",
+   "fieldtype": "Link",
+   "label": "Shaft Depth",
+   "options": "CRM Shaft Depth"
+  },
+  {
+   "fieldname": "total_hight",
+   "fieldtype": "Link",
+   "label": "Total Hight",
+   "options": "CRM Total Hight"
+  },
+  {
+   "fieldname": "floor_hight",
+   "fieldtype": "Link",
+   "label": "Floor Hight",
+   "options": "CRM Floor Hight"
+  },
+  {
+   "fieldname": "shaft_pit",
+   "fieldtype": "Link",
+   "label": "Shaft Pit",
+   "options": "CRM Shaft Pit"
+  },
+  {
+   "fieldname": "structure_type",
+   "fieldtype": "Link",
+   "label": "Shaft type",
+   "options": "CRM Elevator structure type"
+  },
+  {
+   "fieldname": "structure_more_details",
+   "fieldtype": "Data",
+   "label": "More Details"
+  },
+  {
+   "fieldname": "section_break_caai",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "machine",
+   "fieldtype": "Heading",
+   "label": "Machine"
+  },
+  {
+   "fieldname": "machine_type",
+   "fieldtype": "Link",
+   "label": "Machine Type",
+   "options": "CRM Machine Type"
+  },
+  {
+   "fieldname": "machine_brand",
+   "fieldtype": "Link",
+   "label": "Machine Brand",
+   "options": "CRM Machine Brands"
+  },
+  {
+   "fieldname": "machine_power_supply",
+   "fieldtype": "Link",
+   "label": "Machine Power Supply",
+   "options": "CRM Machine Power Supply"
+  },
+  {
+   "fieldname": "machine_speed",
+   "fieldtype": "Link",
+   "label": "Machine Speed",
+   "options": "CRM Machine Speed"
+  },
+  {
+   "fieldname": "machine_person_capacity",
+   "fieldtype": "Link",
+   "label": "Machine Person Capacity",
+   "options": "CRM Machine Person Capacity"
+  },
+  {
+   "fieldname": "machine_capacity_kg",
+   "fieldtype": "Link",
+   "label": "Machine Capacity (KG)",
+   "options": "CRM Machine Capacity"
+  },
+  {
+   "fieldname": "column_break_hxyp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cabin_width",
+   "fieldtype": "Link",
+   "label": "Cabin Width",
+   "options": "CRM Cabin Width"
+  },
+  {
+   "fieldname": "macchine_control_system",
+   "fieldtype": "Link",
+   "label": " Macchine Control System",
+   "options": "CRM Machine Control System"
+  },
+  {
+   "fieldname": "stops__floors__entrance",
+   "fieldtype": "Data",
+   "label": "Stops / Floors / Entrance"
+  },
+  {
+   "fieldname": "overhead",
+   "fieldtype": "Data",
+   "label": "Overhead"
+  },
+  {
+   "fieldname": "travel",
+   "fieldtype": "Data",
+   "label": "Travel"
+  },
+  {
+   "fieldname": "machine_location",
+   "fieldtype": "Link",
+   "label": "Machine location",
+   "options": "CRM Machine location"
+  },
+  {
+   "fieldname": "door_opening",
+   "fieldtype": "Link",
+   "label": "Door Opening",
+   "options": "CRM Door opening"
+  },
+  {
+   "fieldname": "ceiling_material_right",
+   "fieldtype": "Link",
+   "label": "Cabin wall (right)",
+   "options": "CRM Ceiling Material"
+  },
+  {
+   "fieldname": "ceiling_material_rear",
+   "fieldtype": "Link",
+   "label": "Cabin wall (rear)",
+   "options": "CRM Ceiling Material"
+  },
+  {
+   "fieldname": "cabin_celling",
+   "fieldtype": "Link",
+   "label": "Cabin celling",
+   "options": "CRM Ceiling Material"
+  },
+  {
+   "fieldname": "cabin_handrail",
+   "fieldtype": "Link",
+   "label": "Cabin handrail",
+   "options": "CRM Ceiling Material"
+  },
+  {
+   "fieldname": "cabin_color",
+   "fieldtype": "Link",
+   "label": "Cabin Color",
+   "options": "Cabin Color"
+  },
+  {
+   "fieldname": "cop",
+   "fieldtype": "Data",
+   "label": "COP"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-26 12:12:56.324245",
- "modified_by": "Administrator",
+ "modified": "2025-09-24 20:03:40.990218",
+ "modified_by": "thomas550i@gmail.com",
  "module": "FCRM",
  "name": "CRM Deal",
  "naming_rule": "By \"Naming Series\" field",
@@ -469,6 +811,6 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "organization",
+ "title_field": "lead_name",
  "track_changes": 1
 }
