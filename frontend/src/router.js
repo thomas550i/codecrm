@@ -127,19 +127,18 @@ router.beforeEach(async (to, from, next) => {
     await views.promise
 
       let defaultView = getDefaultView()
-      // Check for Dashboard Manager role
       const userRoles = userResource.data?.roles || []
+      if (userRoles.includes('Dashboard Manager')) {
+        next({ name: 'Dashboard' })
+        return
+      }
       if (!defaultView) {
-        if (userRoles.includes('Dashboard Manager')) {
-          next({ name: 'Dashboard' })
-        } else {
-          next({ name: 'Leads' })
-        }
+        next({ name: 'Leads' })
         return
       }
 
       let { route_name, type, name, is_standard } = defaultView
-      route_name = route_name || (userRoles.includes('Dashboard Manager') ? 'Dashboard' : 'Leads')
+      route_name = route_name || 'Leads'
 
       if (name && !is_standard) {
         next({ name: route_name, params: { viewType: type }, query: { view: name } })

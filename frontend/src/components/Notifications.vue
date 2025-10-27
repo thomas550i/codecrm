@@ -39,30 +39,31 @@
           :key="n.comment"
           :to="getRoute(n)"
           class="flex cursor-pointer items-start gap-2.5 px-4 py-2.5 hover:bg-surface-gray-2"
+          :style="n.read ? '' : 'background: #fff7f7;'"
           @click="markAsRead(n.comment || n.notification_type_doc)"
         >
           <div class="mt-1 flex items-center gap-2.5">
             <div
-              class="size-[5px] rounded-full"
-              :class="[n.read ? 'bg-transparent' : 'bg-surface-gray-7']"
+              class="size-[8px] rounded-full"
+              :class="n.read ? 'bg-gray-300' : 'bg-red-500 animate-pulse'"
             />
             <WhatsAppIcon v-if="n.type == 'WhatsApp'" class="size-7" />
             <UserAvatar v-else :user="n.from_user.name" size="lg" />
           </div>
           <div>
             <div v-if="n.notification_text" v-html="n.notification_text" />
-            <div v-else class="mb-2 space-x-1 leading-5 text-ink-gray-5">
-              <span class="font-medium text-ink-gray-9">
+            <div v-else class="mb-2 space-x-1 leading-5" :class="n.read ? 'text-ink-gray-5' : 'text-ink-gray-9 font-bold'">
+              <span class="font-medium">
                 {{ n.from_user.full_name }}
               </span>
               <span>
                 {{ __('mentioned you in {0}', [n.reference_doctype]) }}
               </span>
-              <span class="font-medium text-ink-gray-9">
+              <span class="font-medium">
                 {{ n.reference_name }}
               </span>
             </div>
-            <div class="text-sm text-ink-gray-5">
+            <div class="text-sm" :class="n.read ? 'text-ink-gray-5' : 'text-red-500 font-semibold'">
               {{ __(timeAgo(n.creation)) }}
             </div>
           </div>
