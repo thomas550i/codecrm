@@ -321,7 +321,7 @@ import IndicatorIcon from '@/components/Icons/IndicatorIcon.vue'
 import { isTouchScreenDevice, colors, parseColor } from '@/utils'
 import Draggable from 'vuedraggable'
 import { Dropdown, Popover } from 'frappe-ui'
-import { computed } from 'vue'
+// ...existing code...
 
 const props = defineProps({
   options: {
