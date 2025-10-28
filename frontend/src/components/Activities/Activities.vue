@@ -495,7 +495,7 @@ import CommunicationArea from '@/components/CommunicationArea.vue'
 import WhatsappTemplateSelectorModal from '@/components/Modals/WhatsappTemplateSelectorModal.vue'
 import AllModals from '@/components/Activities/AllModals.vue'
 import FilesUploader from '@/components/FilesUploader/FilesUploader.vue'
-import { timeAgo, formatDate, startCase } from '@/utils'
+import { timeAgo, formatDate, startCase, mapCommunicationsToActivities } from '@/utils'
 import { globalStore } from '@/stores/global'
 import { usersStore } from '@/stores/users'
 import { whatsappEnabled, callEnabled } from '@/composables/settings'
@@ -635,51 +635,20 @@ const activities = computed(() => {
     _activities = get_activities()
   } else if (title.value == 'Emails') {
     if (!all_activities.data?.versions) return []
-    _activities = all_activities.data.versions.filter(
+    // Map to EmailArea format
+    _activities = mapCommunicationsToActivities({ communications: all_activities.data.versions.filter(
       (activity) => activity.activity_type === 'communication',
-    )
+    ) }, null)
   } else if (title.value == 'Comments') {
-    if (!all_activities.data?.versions) return []
-    _activities = all_activities.data.versions.filter(
-      (activity) => activity.activity_type === 'comment',
-    )
+    _activities = all_activities.data?.notes || []
   } else if (title.value == 'Calls') {
-    if (!all_activities.data?.calls) return []
-    return sortByCreation(all_activities.data.calls)
+    _activities = all_activities.data?.calls || []
   } else if (title.value == 'Tasks') {
-    if (!all_activities.data?.tasks) return []
-    return sortByModified(all_activities.data.tasks)
-  } else if (title.value == 'Opportunity') { 
-    if (!all_activities.data?.opportunity) return []
-    return sortByModified(all_activities.data.opportunity)
-  } else if (title.value == 'Notes') {
-    if (!all_activities.data?.notes) return []
-    return sortByModified(all_activities.data.notes)
+    _activities = all_activities.data?.tasks || []
   } else if (title.value == 'Attachments') {
-    if (!all_activities.data?.attachments) return []
-    return sortByModified(all_activities.data.attachments)
+    _activities = all_activities.data?.attachments || []
   }
-
-  _activities.forEach((activity) => {
-    activity.icon = timelineIcon(activity.activity_type, activity.is_lead)
-
-    if (
-      activity.activity_type == 'incoming_call' ||
-      activity.activity_type == 'outgoing_call' ||
-      activity.activity_type == 'communication'
-    )
-      return
-
-    update_activities_details(activity)
-
-    if (activity.other_versions) {
-      activity.show_others = false
-      activity.other_versions.forEach((other_version) => {
-        update_activities_details(other_version)
-      })
-    }
-  })
-  return sortByCreation(_activities)
+  return _activities
 })
 
 function sortByCreation(list) {
