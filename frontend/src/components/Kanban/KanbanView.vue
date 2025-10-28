@@ -187,15 +187,15 @@ async function insertLinkedStatusIfNeeded(newStatus) {
     fieldname: statusField,
   });
   console.log('Meta response:', meta);
-  if (meta && meta.message && meta.message.fieldtype === 'Link') {
-    const linkedDoctype = meta.message.options;
+  if (meta && meta.fieldtype === 'Link') {
+    const linkedDoctype = meta.options;
     console.log('Calling frappe.client.insert for:', newStatus, 'in', linkedDoctype);
     // Insert new status in linked doctype
     await call('frappe.client.insert', {
       doc: {
         doctype: linkedDoctype,
         // Use first text field as status name, fallback to 'name'
-        [meta.message.label?.toLowerCase() || 'name']: newStatus,
+        [meta.label?.toLowerCase() || 'name']: newStatus,
         name: newStatus,
       },
     });
