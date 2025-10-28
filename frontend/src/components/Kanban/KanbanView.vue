@@ -169,7 +169,14 @@
   </div>
 </template>
 <script setup>
+import { ref, computed } from 'vue'
 import { call } from 'frappe-ui'
+import Autocomplete from '@/components/frappe-ui/Autocomplete.vue'
+import IndicatorIcon from '@/components/Icons/IndicatorIcon.vue'
+import { isTouchScreenDevice, colors, parseColor } from '@/utils'
+import Draggable from 'vuedraggable'
+import { Dropdown, Popover } from 'frappe-ui'
+
 // Helper to insert new status in linked doctype if status field is Link
 async function insertLinkedStatusIfNeeded(newStatus) {
   // Get doctype and status field from Kanban settings
@@ -224,7 +231,6 @@ async function syncDoctypeStatusField() {
   });
 }
 
-import { ref, computed } from 'vue'
 const showStatusForm = ref(false)
 const statusDoctype = ref('')
 const statusFormFields = ref([])
@@ -233,14 +239,40 @@ const statusDropdownOptions = ref([])
 // Fetch available statuses for dropdown
 async function fetchStatusOptions() {
   // Get field meta
-  import { ref, computed } from 'vue'
-  const showStatusForm = ref(false)
-  const statusDoctype = ref('')
-  const statusFormFields = ref([])
-  const statusDropdownOptions = ref([])
+  const doctype = props.options?.doctype;
+  const statusField = kanban.value?.data?.column_field;
+  if (!doctype || !statusField) return;
+  if (doctype === 'CRM Deal') {
+    // Hardcoded insert API call for CRM Deal
+    // Only deal_status is dynamic
+    const newDealStatus = newStatusName.value.trim(); // Replace with dynamic value if needed
+    await call('frappe.client.insert', {
+      doc: {
+        doctype: 'CRM Deal Status',
+        type: 'Open',
+        color: 'gray',
+        deal_status: newDealStatus,
+      }
+    });
+    // Optionally update dropdown/options here if needed
+    return;
+  }
+  // Otherwise, proceed with normal logic
+  const meta = await call('crm.api.views.get_field_meta', {
+    doctype,
     fieldname: statusField,
   });
   if (meta && meta.fieldtype === 'Link') {
+    const linkedDoctype = meta.options;
+    // Fetch all status records from linked doctype
+    const res = await call('frappe.client.get_list', {
+      doctype: linkedDoctype,
+      fields: ['name', meta.fieldname],
+      limit: 100,
+    });
+    statusDropdownOptions.value = (res.message || []).map((item) => ({
+      label: item[meta.fieldname] || item.name,
+      value: item[meta.fieldname] || item.name,
     }));
     // Add 'Create New' option
     statusDropdownOptions.value.push({
@@ -317,13 +349,6 @@ async function addStatus() {
   // Sync doctype status field with Kanban
   syncDoctypeStatusField()
 }
-import Autocomplete from '@/components/frappe-ui/Autocomplete.vue'
-import IndicatorIcon from '@/components/Icons/IndicatorIcon.vue'
-import { isTouchScreenDevice, colors, parseColor } from '@/utils'
-import Draggable from 'vuedraggable'
-import { Dropdown, Popover } from 'frappe-ui'
-// ...existing code...
-
 const props = defineProps({
   options: {
     type: Object,
