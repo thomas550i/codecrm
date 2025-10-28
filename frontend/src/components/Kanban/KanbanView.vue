@@ -218,7 +218,7 @@ import { ref } from 'vue'
 const showAddStatus = ref(false)
 const newStatusName = ref('')
 
-function addStatus() {
+async function addStatus() {
   if (!newStatusName.value.trim()) return
   // Add new status to kanban columns
   kanban.value.data.data.push({
@@ -234,7 +234,11 @@ function addStatus() {
     fields: [],
   })
   // Insert new status in linked doctype if needed
-  insertLinkedStatusIfNeeded(newStatusName.value)
+  try {
+    await insertLinkedStatusIfNeeded(newStatusName.value)
+  } catch (err) {
+    console.error('Error inserting linked status:', err)
+  }
   newStatusName.value = ''
   showAddStatus.value = false
   updateColumn()
