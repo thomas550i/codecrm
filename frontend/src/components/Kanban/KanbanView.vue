@@ -173,6 +173,29 @@
   </div>
 </template>
 <script setup>
+// Helper to insert new status in linked doctype if status field is Link
+async function insertLinkedStatusIfNeeded(newStatus) {
+  // Get doctype and status field from Kanban settings
+  const doctype = kanban.value?.data?.doctype;
+  const statusField = kanban.value?.data?.column_field;
+  // Get field meta from backend (assume you have a way to fetch it)
+  const meta = await frappe.call('crm.api.doc.get_field_meta', {
+    doctype,
+    fieldname: statusField,
+  });
+  if (meta.message && meta.message.fieldtype === 'Link') {
+    const linkedDoctype = meta.message.options;
+    // Insert new status in linked doctype
+    await frappe.call('frappe.client.insert', {
+      doc: {
+        doctype: linkedDoctype,
+        // Use first text field as status name, fallback to 'name'
+        [meta.message.label?.toLowerCase() || 'name']: newStatus,
+        name: newStatus,
+      },
+    });
+  }
+}
 // Helper to sync doctype status field with Kanban
 async function syncDoctypeStatusField() {
   // Get doctype and status field from Kanban settings
@@ -207,6 +230,8 @@ function addStatus() {
     data: [],
     fields: [],
   })
+  // Insert new status in linked doctype if needed
+  insertLinkedStatusIfNeeded(newStatusName.value)
   newStatusName.value = ''
   showAddStatus.value = false
   updateColumn()
