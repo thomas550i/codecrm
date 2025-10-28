@@ -70,6 +70,14 @@
           >
             Cancel
           </Button>
+          <Button
+            size="sm"
+            variant="danger"
+            class="ml-1"
+            @click="clearColumnFilter(column)"
+          >
+            Clear
+          </Button>
         </div>
       </ListHeaderItem>
     </ListHeader>
@@ -235,16 +243,30 @@
 <script setup>
 import { ref } from 'vue'
 const filterValue = ref('')
+const columnFilters = ref({})
 
 const filterPopover = ref({ open: false, columnKey: null, value: '' })
 
 function openColumnFilter(column) {
-  filterPopover.value = { open: true, columnKey: column.key, value: '' }
+  filterPopover.value = {
+    open: true,
+    columnKey: column.key,
+    value: columnFilters.value[column.key] || ''
+  }
 }
 function applyColumnFilter(column) {
   if (filterPopover.value.value) {
+    columnFilters.value[column.key] = filterPopover.value.value
     list.value.params.filters = list.value.params.filters || {}
-    list.value.params.filters[column.key] = ['Like', '%' + filterPopover.value.value + '%']
+    list.value.params.filters[column.key] = ['like', filterPopover.value.value]
+    list.value.fetch()
+  }
+  filterPopover.value = { open: false, columnKey: null, value: '' }
+}
+function clearColumnFilter(column) {
+  delete columnFilters.value[column.key]
+  if (list.value.params.filters) {
+    delete list.value.params.filters[column.key]
     list.value.fetch()
   }
   filterPopover.value = { open: false, columnKey: null, value: '' }
