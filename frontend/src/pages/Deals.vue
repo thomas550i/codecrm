@@ -37,6 +37,7 @@
         query: { view: route.query.view, viewType: route.params.viewType },
       }),
       onNewClick: (column) => onNewClick(column),
+      doctype: 'CRM Deal',
     }"
     @update="(data) => viewControls.updateKanbanSettings(data)"
     @loadMore="(columnName) => viewControls.loadMoreKanban(columnName)"
