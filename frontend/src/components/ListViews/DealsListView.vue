@@ -1,4 +1,8 @@
 <template>
+  <div class="flex items-center justify-between px-3 py-2">
+    <div class="text-lg font-semibold">Opportunity</div>
+    <div class="text-base text-ink-gray-6">Total: {{ options.totalCount }}</div>
+  </div>
   <ListView
     :class="$attrs.class"
     :columns="columns"

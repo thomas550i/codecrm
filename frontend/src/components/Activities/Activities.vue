@@ -495,7 +495,7 @@ import CommunicationArea from '@/components/CommunicationArea.vue'
 import WhatsappTemplateSelectorModal from '@/components/Modals/WhatsappTemplateSelectorModal.vue'
 import AllModals from '@/components/Activities/AllModals.vue'
 import FilesUploader from '@/components/FilesUploader/FilesUploader.vue'
-import { timeAgo, formatDate, startCase, mapCommunicationsToActivities } from '@/utils'
+import { timeAgo, formatDate, startCase } from '@/utils'
 import { globalStore } from '@/stores/global'
 import { usersStore } from '@/stores/users'
 import { whatsappEnabled, callEnabled } from '@/composables/settings'
@@ -635,10 +635,9 @@ const activities = computed(() => {
     _activities = get_activities()
   } else if (title.value == 'Emails') {
     if (!all_activities.data?.versions) return []
-    // Map to EmailArea format
-    _activities = mapCommunicationsToActivities({ communications: all_activities.data.versions.filter(
+    _activities = all_activities.data.versions.filter(
       (activity) => activity.activity_type === 'communication',
-    ) }, null)
+    )
   } else if (title.value == 'Comments') {
     _activities = all_activities.data?.notes || []
   } else if (title.value == 'Calls') {
