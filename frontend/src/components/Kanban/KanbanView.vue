@@ -180,7 +180,7 @@ async function insertLinkedStatusIfNeeded(newStatus) {
   const doctype = kanban.value?.data?.doctype;
   const statusField = kanban.value?.data?.column_field;
   // Get field meta from backend (assume you have a way to fetch it)
-  const meta = await call('crm.api.doc.get_field_meta', {
+  const meta = await call('crm.api.views.get_field_meta', {
     doctype,
     fieldname: statusField,
   });
