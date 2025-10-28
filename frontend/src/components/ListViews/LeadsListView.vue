@@ -1,7 +1,12 @@
 <template>
   <div class="flex items-center justify-between px-3 py-2">
     <div class="text-lg font-semibold">Leads</div>
-    <div class="text-base text-ink-gray-6">Total: {{ options.totalCount }}</div>
+      <div class="flex items-center justify-end gap-2" style="min-width: 120px;">
+        <span class="text-sm text-ink-gray-7">Total:</span>
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-ink-gray-2 text-ink-gray-9 border border-ink-gray-3">
+          {{ options.totalCount }}
+        </span>
+      </div>
   </div>
   <ListView
     :class="$attrs.class"

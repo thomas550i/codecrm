@@ -145,25 +145,50 @@
         </div>
       </template>
     </Draggable>
-    <div v-if="deletedColumns.length" class="shrink-0 min-w-64">
-      <Autocomplete
-        value=""
-        :options="deletedColumns"
-        @change="(e) => addColumn(e)"
-      >
-        <template #target="{ togglePopover }">
-          <Button
-            class="w-full mt-2.5 mb-1 mr-5"
-            :label="__('Add Column')"
-            iconLeft="plus"
-            @click="togglePopover()"
-          />
+    <div class="shrink-0 min-w-64 flex flex-col items-center justify-center mt-2.5 mb-1 mr-5">
+      <Button
+        class="w-full"
+        :label="__('Add Status')"
+        iconLeft="plus"
+        @click="showAddStatus = true"
+      />
+      <Dialog v-model="showAddStatus" :options="{ title: __('Add Status') }">
+        <template #body-content>
+          <div class="flex flex-col gap-3">
+            <Input v-model="newStatusName" placeholder="Enter status name" />
+            <Button :label="__('Add')" @click="addStatus" />
+          </div>
         </template>
-      </Autocomplete>
+      </Dialog>
     </div>
   </div>
 </template>
 <script setup>
+import Dialog from '@/components/frappe-ui/Dialog.vue'
+import Input from '@/components/frappe-ui/Input.vue'
+import { ref } from 'vue'
+const showAddStatus = ref(false)
+const newStatusName = ref('')
+
+function addStatus() {
+  if (!newStatusName.value.trim()) return
+  // Add new status to kanban columns
+  kanban.value.data.data.push({
+    column: {
+      name: newStatusName.value,
+      color: colors[kanban.value.data.data.length % colors.length],
+      order: [],
+      all_count: 0,
+      count: 0,
+      delete: false,
+    },
+    data: [],
+    fields: [],
+  })
+  newStatusName.value = ''
+  showAddStatus.value = false
+  updateColumn()
+}
 import Autocomplete from '@/components/frappe-ui/Autocomplete.vue'
 import IndicatorIcon from '@/components/Icons/IndicatorIcon.vue'
 import { isTouchScreenDevice, colors, parseColor } from '@/utils'
