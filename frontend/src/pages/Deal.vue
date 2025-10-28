@@ -18,8 +18,8 @@
       />
       <AssignTo v-model="assignees.data" doctype="CRM Deal" :docname="dealId" />
       <Dropdown
-        v-if="doc && document.statuses"
-        :options="statuses"
+  v-if="doc && statuses && statuses.length"
+  :options="statuses"
         placement="right"
       >
         <template #default="{ open }">
@@ -506,10 +506,11 @@ const title = computed(() => {
 })
 
 const statuses = computed(() => {
-  let customStatuses = document.statuses?.length
+  // Always use Kanban settings for statuses
+  let kanbanStatuses = document.statuses?.length
     ? document.statuses
     : document._statuses || []
-  return statusOptions('deal', customStatuses, triggerStatusChange)
+  return statusOptions('deal', kanbanStatuses, triggerStatusChange)
 })
 
 usePageMeta(() => {

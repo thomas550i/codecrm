@@ -173,6 +173,21 @@
   </div>
 </template>
 <script setup>
+// Helper to sync doctype status field with Kanban
+async function syncDoctypeStatusField() {
+  // Get doctype and status field from Kanban settings
+  const doctype = kanban.value?.data?.doctype;
+  const statusField = kanban.value?.data?.column_field;
+  // Get all status names from Kanban columns
+  const statusList = kanban.value?.data?.data?.map(col => col.column.name) || [];
+  if (!doctype || !statusField || !statusList.length) return;
+  // Call backend API to update status field options
+  await frappe.call('crm.api.kanban.update_deal_status_options', {
+    doctype,
+    status_field: statusField,
+    status_list: statusList,
+  });
+}
 import { ref } from 'vue'
 const showAddStatus = ref(false)
 const newStatusName = ref('')
@@ -195,6 +210,8 @@ function addStatus() {
   newStatusName.value = ''
   showAddStatus.value = false
   updateColumn()
+  // Sync doctype status field with Kanban
+  syncDoctypeStatusField()
 }
 import Autocomplete from '@/components/frappe-ui/Autocomplete.vue'
 import IndicatorIcon from '@/components/Icons/IndicatorIcon.vue'
