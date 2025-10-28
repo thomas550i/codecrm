@@ -24,6 +24,6 @@ def get_field_meta(doctype, fieldname):
                 "fieldtype": field.fieldtype,
                 "label": field.label,
                 "options": field.options,
-				"fieldname":field.name
+				"fieldname":field.fieldname
             }
     return {}
