@@ -23,6 +23,7 @@ def get_field_meta(doctype, fieldname):
             return {
                 "fieldtype": field.fieldtype,
                 "label": field.label,
-                "options": field.options
+                "options": field.options,
+				"fieldname":field.name
             }
     return {}
