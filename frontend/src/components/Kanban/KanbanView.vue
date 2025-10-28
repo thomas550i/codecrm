@@ -159,8 +159,9 @@
           :placeholder="__('Enter new status')"
         />
         <Button
-          class="mt-2 w-full"
+          class="mt-2 w-full !bg-primary-600 !text-white !border-primary-600 hover:!bg-primary-700"
           :label="__('Save')"
+          variant="solid"
           @click="addStatus"
         />
         <Button
@@ -264,35 +265,63 @@ function addStatusToKanban(statusName) {
 async function addStatus() {
   if (!newStatusName.value.trim()) return;
   const doctype = props.options?.doctype;
+  let insertSuccess = true;
   if (doctype === 'CRM Deal') {
     // Hardcoded insert API call for CRM Deal
     const newDealStatus = newStatusName.value.trim();
-    await call('frappe.client.insert', {
-      doc: {
-        doctype: 'CRM Deal Status',
-        type: 'Open',
-        color: 'gray',
-        deal_status: newDealStatus,
-      }
-    });
+    try {
+      const res = await call('frappe.client.insert', {
+        doc: {
+          doctype: 'CRM Deal Status',
+          type: 'Open',
+          color: 'gray',
+          deal_status: newDealStatus,
+        }
+      });
+      insertSuccess = !!(res && res.message);
+    } catch (err) {
+      insertSuccess = false;
+      console.error('Insert failed:', err);
+    }
   }
-  // Add new status to kanban columns
-  kanban.value.data.data.push({
-    column: {
-      name: newStatusName.value,
-      color: colors[kanban.value.data.data.length % colors.length],
-      order: [],
-      all_count: 0,
-      count: 0,
-      delete: false,
-    },
-    data: [],
-    fields: [],
-  });
-  newStatusName.value = '';
-  showAddStatus.value = false;
-  updateColumn();
-  syncDoctypeStatusField();
+
+   if (doctype === 'CRM Lead') {
+    // Hardcoded insert API call for CRM Deal
+    const newDealStatus = newStatusName.value.trim();
+    try {
+      const res = await call('frappe.client.insert', {
+        doc: {
+          doctype: 'CRM Lead Status',
+          color: 'gray',
+          lead_status: newDealStatus,
+        }
+      });
+      insertSuccess = !!(res && res.message);
+    } catch (err) {
+      insertSuccess = false;
+      console.error('Insert failed:', err);
+    }
+  }
+
+
+  if (insertSuccess) {
+    kanban.value.data.data.push({
+      column: {
+        name: newStatusName.value,
+        color: colors[kanban.value.data.data.length % colors.length],
+        order: [],
+        all_count: 0,
+        count: 0,
+        delete: false,
+      },
+      data: [],
+      fields: [],
+    });
+    newStatusName.value = '';
+    showAddStatus.value = false;
+    updateColumn();
+    syncDoctypeStatusField();
+  }
 }
 const props = defineProps({
   options: {
