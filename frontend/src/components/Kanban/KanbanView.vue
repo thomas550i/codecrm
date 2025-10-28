@@ -146,29 +146,25 @@
       </template>
     </Draggable>
     <div class="shrink-0 min-w-64 flex flex-col items-center justify-center mt-2.5 mb-1 mr-5">
-      <Popover v-model="showAddStatus">
-        <template #target="{ togglePopover }">
+      <Dropdown
+        :options="statusDropdownOptions"
+        @select="handleStatusDropdownSelect"
+      >
+        <template #default>
           <Button
             class="w-full"
             :label="__('Add Status')"
             iconLeft="plus"
-            @click="togglePopover()"
           />
         </template>
-        <template #body>
-          <div class="flex flex-col gap-3 p-4 min-w-56">
-            <div class="text-base font-semibold mb-2">{{ __('Add Status') }}</div>
-            <input
-              v-model="newStatusName"
-              type="text"
-              class="border rounded px-2 py-1 text-base"
-              :placeholder="__('Enter status name')"
-              @keyup.enter="addStatus"
-            />
-            <Button :label="__('Add')" @click="addStatus" />
-          </div>
-        </template>
-      </Popover>
+      </Dropdown>
+      <DynamicFormModal
+        v-if="showStatusForm"
+        v-model="showStatusForm"
+        :doctype="statusDoctype"
+        :fields="statusFormFields"
+        @success="onStatusCreated"
+      />
     </div>
   </div>
 </template>
@@ -216,9 +212,82 @@ async function syncDoctypeStatusField() {
     status_list: statusList,
   });
 }
-import { ref } from 'vue'
-const showAddStatus = ref(false)
-const newStatusName = ref('')
+
+import { ref, computed } from 'vue'
+const showStatusForm = ref(false)
+const statusDoctype = ref('')
+const statusFormFields = ref([])
+const statusDropdownOptions = ref([])
+
+// Fetch available statuses for dropdown
+async function fetchStatusOptions() {
+  // Get field meta
+  const doctype = props.options?.doctype;
+  const statusField = kanban.value?.data?.column_field;
+  if (!doctype || !statusField) return;
+  const meta = await call('crm.api.views.get_field_meta', {
+    doctype,
+    fieldname: statusField,
+  });
+  if (meta && meta.fieldtype === 'Link') {
+    const linkedDoctype = meta.options;
+    // Fetch all status records from linked doctype
+    const res = await call('frappe.client.get_list', {
+      doctype: linkedDoctype,
+      fields: ['name', meta.fieldname],
+      limit: 100,
+    });
+    statusDropdownOptions.value = (res.message || []).map((item) => ({
+      label: item[meta.fieldname] || item.name,
+      value: item[meta.fieldname] || item.name,
+    }));
+    // Add 'Create New' option
+    statusDropdownOptions.value.push({
+      label: __('Create New'),
+      value: '__create_new__',
+    });
+    statusDoctype.value = linkedDoctype;
+    statusFormFields.value = [
+      { fieldname: meta.fieldname, label: meta.label, fieldtype: 'Data', reqd: 1 },
+    ];
+  }
+}
+
+fetchStatusOptions();
+
+function handleStatusDropdownSelect(option) {
+  if (option.value === '__create_new__') {
+    showStatusForm.value = true;
+  } else {
+    // Add selected status to Kanban columns
+    addStatusToKanban(option.value);
+  }
+}
+
+function addStatusToKanban(statusName) {
+  kanban.value.data.data.push({
+    column: {
+      name: statusName,
+      color: colors[kanban.value.data.data.length % colors.length],
+      order: [],
+      all_count: 0,
+      count: 0,
+      delete: false,
+    },
+    data: [],
+    fields: [],
+  });
+  updateColumn();
+  syncDoctypeStatusField();
+}
+
+function onStatusCreated(newDoc) {
+  showStatusForm.value = false;
+  // Add new status to Kanban columns
+  addStatusToKanban(newDoc[statusFormFields.value[0].fieldname]);
+  // Refresh dropdown
+  fetchStatusOptions();
+}
 
 async function addStatus() {
   if (!newStatusName.value.trim()) return
