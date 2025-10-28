@@ -184,7 +184,6 @@ async function insertLinkedStatusIfNeeded(newStatus) {
   const doctype = props.options?.doctype;
   const statusField = kanban.value?.data?.column_field;
   if (!doctype || !statusField) return;
-  import { call } from 'frappe-ui'
 
   const props = defineProps({
     options: {
