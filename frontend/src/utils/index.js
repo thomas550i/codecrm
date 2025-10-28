@@ -703,3 +703,5 @@ export function validateConditions(conditions) {
 
   return conditions.length > 0
 }
+
+export * from './emailMapping'
