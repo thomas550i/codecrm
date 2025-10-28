@@ -177,9 +177,14 @@ import { call } from 'frappe-ui'
 // Helper to insert new status in linked doctype if status field is Link
 async function insertLinkedStatusIfNeeded(newStatus) {
   // Get doctype and status field from Kanban settings
-  const doctype = kanban.value?.data?.doctype;
+  let doctype = kanban.value?.data?.doctype;
+  if (!doctype) {
+    // Try fallback from props or other context if available
+    doctype = props.options?.doctype || '';
+  }
   const statusField = kanban.value?.data?.column_field;
-  // Get field meta from backend (assume you have a way to fetch it)
+  if (!doctype || !statusField) return;
+  // Get field meta from backend
   const meta = await call('crm.api.views.get_field_meta', {
     doctype,
     fieldname: statusField,
