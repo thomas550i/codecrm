@@ -177,7 +177,18 @@ async function insertLinkedStatusIfNeeded(newStatus) {
   const doctype = props.options?.doctype;
   const statusField = kanban.value?.data?.column_field;
   if (!doctype || !statusField) return;
-  // Get field meta from backend
+  import { call } from 'frappe-ui'
+
+  const props = defineProps({
+    options: {
+      type: Object,
+      default: () => ({
+        getRoute: null,
+        onClick: null,
+        onNewClick: null,
+      }),
+    },
+  })
   const meta = await call('crm.api.views.get_field_meta', {
     doctype,
     fieldname: statusField,
@@ -222,24 +233,14 @@ const statusDropdownOptions = ref([])
 // Fetch available statuses for dropdown
 async function fetchStatusOptions() {
   // Get field meta
-  const doctype = props.options?.doctype;
-  const statusField = kanban.value?.data?.column_field;
-  if (!doctype || !statusField) return;
-  const meta = await call('crm.api.views.get_field_meta', {
-    doctype,
+  import { ref, computed } from 'vue'
+  const showStatusForm = ref(false)
+  const statusDoctype = ref('')
+  const statusFormFields = ref([])
+  const statusDropdownOptions = ref([])
     fieldname: statusField,
   });
   if (meta && meta.fieldtype === 'Link') {
-    const linkedDoctype = meta.options;
-    // Fetch all status records from linked doctype
-    const res = await call('frappe.client.get_list', {
-      doctype: linkedDoctype,
-      fields: ['name', meta.fieldname],
-      limit: 100,
-    });
-    statusDropdownOptions.value = (res.message || []).map((item) => ({
-      label: item[meta.fieldname] || item.name,
-      value: item[meta.fieldname] || item.name,
     }));
     // Add 'Create New' option
     statusDropdownOptions.value.push({
