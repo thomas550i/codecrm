@@ -146,25 +146,30 @@
       </template>
     </Draggable>
     <div class="shrink-0 min-w-64 flex flex-col items-center justify-center mt-2.5 mb-1 mr-5">
-      <Dropdown
-        :options="statusDropdownOptions"
-        @select="handleStatusDropdownSelect"
-      >
-        <template #default>
-          <Button
-            class="w-full"
-            :label="__('Add Status')"
-            iconLeft="plus"
-          />
-        </template>
-      </Dropdown>
-      <DynamicFormModal
-        v-if="showStatusForm"
-        v-model="showStatusForm"
-        :doctype="statusDoctype"
-        :fields="statusFormFields"
-        @success="onStatusCreated"
+      <Button
+        class="w-full"
+        :label="__('Add Status')"
+        iconLeft="plus"
+        @click="showAddStatus = true"
       />
+      <div v-if="showAddStatus" class="mt-2 w-full flex flex-col items-center">
+        <input
+          v-model="newStatusName"
+          class="border rounded px-3 py-2 w-full"
+          :placeholder="__('Enter new status')"
+        />
+        <Button
+          class="mt-2 w-full"
+          :label="__('Save')"
+          @click="addStatus"
+        />
+        <Button
+          class="mt-2 w-full"
+          :label="__('Cancel')"
+          variant="ghost"
+          @click="showAddStatus = false"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -230,71 +235,12 @@ async function syncDoctypeStatusField() {
   });
 }
 
-const showStatusForm = ref(false)
-const statusDoctype = ref('')
-const statusFormFields = ref([])
-const statusDropdownOptions = ref([])
+const showAddStatus = ref(false)
+const newStatusName = ref('')
 
-// Fetch available statuses for dropdown
-async function fetchStatusOptions() {
-  // Get field meta
-  const doctype = props.options?.doctype;
-  const statusField = kanban.value?.data?.column_field;
-  if (!doctype || !statusField) return;
-  if (doctype === 'CRM Deal') {
-    // Hardcoded insert API call for CRM Deal
-    // Only deal_status is dynamic
-    const newDealStatus = newStatusName.value.trim(); // Replace with dynamic value if needed
-    await call('frappe.client.insert', {
-      doc: {
-        doctype: 'CRM Deal Status',
-        type: 'Open',
-        color: 'gray',
-        deal_status: newDealStatus,
-      }
-    });
-    // Optionally update dropdown/options here if needed
-    return;
-  }
-  // Otherwise, proceed with normal logic
-  const meta = await call('crm.api.views.get_field_meta', {
-    doctype,
-    fieldname: statusField,
-  });
-  if (meta && meta.fieldtype === 'Link') {
-    const linkedDoctype = meta.options;
-    // Fetch all status records from linked doctype
-    const res = await call('frappe.client.get_list', {
-      doctype: linkedDoctype,
-      fields: ['name', meta.fieldname],
-      limit: 100,
-    });
-    statusDropdownOptions.value = (res.message || []).map((item) => ({
-      label: item[meta.fieldname] || item.name,
-      value: item[meta.fieldname] || item.name,
-    }));
-    // Add 'Create New' option
-    statusDropdownOptions.value.push({
-      label: __('Create New'),
-      value: '__create_new__',
-    });
-    statusDoctype.value = linkedDoctype;
-    statusFormFields.value = [
-      { fieldname: meta.fieldname, label: meta.label, fieldtype: 'Data', reqd: 1 },
-    ];
-  }
-}
 
-fetchStatusOptions();
 
-function handleStatusDropdownSelect(option) {
-  if (option.value === '__create_new__') {
-    showStatusForm.value = true;
-  } else {
-    // Add selected status to Kanban columns
-    addStatusToKanban(option.value);
-  }
-}
+
 
 function addStatusToKanban(statusName) {
   kanban.value.data.data.push({
@@ -313,16 +259,23 @@ function addStatusToKanban(statusName) {
   syncDoctypeStatusField();
 }
 
-function onStatusCreated(newDoc) {
-  showStatusForm.value = false;
-  // Add new status to Kanban columns
-  addStatusToKanban(newDoc[statusFormFields.value[0].fieldname]);
-  // Refresh dropdown
-  fetchStatusOptions();
-}
+
 
 async function addStatus() {
-  if (!newStatusName.value.trim()) return
+  if (!newStatusName.value.trim()) return;
+  const doctype = props.options?.doctype;
+  if (doctype === 'CRM Deal') {
+    // Hardcoded insert API call for CRM Deal
+    const newDealStatus = newStatusName.value.trim();
+    await call('frappe.client.insert', {
+      doc: {
+        doctype: 'CRM Deal Status',
+        type: 'Open',
+        color: 'gray',
+        deal_status: newDealStatus,
+      }
+    });
+  }
   // Add new status to kanban columns
   kanban.value.data.data.push({
     column: {
@@ -335,18 +288,11 @@ async function addStatus() {
     },
     data: [],
     fields: [],
-  })
-  // Insert new status in linked doctype if needed
-  try {
-    await insertLinkedStatusIfNeeded(newStatusName.value)
-  } catch (err) {
-    console.error('Error inserting linked status:', err)
-  }
-  newStatusName.value = ''
-  showAddStatus.value = false
-  updateColumn()
-  // Sync doctype status field with Kanban
-  syncDoctypeStatusField()
+  });
+  newStatusName.value = '';
+  showAddStatus.value = false;
+  updateColumn();
+  syncDoctypeStatusField();
 }
 const props = defineProps({
   options: {
