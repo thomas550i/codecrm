@@ -186,8 +186,10 @@ async function insertLinkedStatusIfNeeded(newStatus) {
     doctype,
     fieldname: statusField,
   });
+  console.log('Meta response:', meta);
   if (meta.message && meta.message.fieldtype === 'Link') {
     const linkedDoctype = meta.message.options;
+    console.log('Calling frappe.client.insert for:', newStatus, 'in', linkedDoctype);
     // Insert new status in linked doctype
     await call('frappe.client.insert', {
       doc: {
@@ -197,6 +199,8 @@ async function insertLinkedStatusIfNeeded(newStatus) {
         name: newStatus,
       },
     });
+  } else {
+    console.log('Not a Link field or missing meta:', meta);
   }
 }
 // Helper to sync doctype status field with Kanban
