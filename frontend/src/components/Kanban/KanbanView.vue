@@ -146,26 +146,33 @@
       </template>
     </Draggable>
     <div class="shrink-0 min-w-64 flex flex-col items-center justify-center mt-2.5 mb-1 mr-5">
-      <Button
-        class="w-full"
-        :label="__('Add Status')"
-        iconLeft="plus"
-        @click="showAddStatus = true"
-      />
-      <Dialog v-model="showAddStatus" :options="{ title: __('Add Status') }">
-        <template #body-content>
-          <div class="flex flex-col gap-3">
-            <Input v-model="newStatusName" placeholder="Enter status name" />
+      <Popover v-model="showAddStatus">
+        <template #target="{ togglePopover }">
+          <Button
+            class="w-full"
+            :label="__('Add Status')"
+            iconLeft="plus"
+            @click="togglePopover()"
+          />
+        </template>
+        <template #body>
+          <div class="flex flex-col gap-3 p-4 min-w-56">
+            <div class="text-base font-semibold mb-2">{{ __('Add Status') }}</div>
+            <input
+              v-model="newStatusName"
+              type="text"
+              class="border rounded px-2 py-1 text-base"
+              :placeholder="__('Enter status name')"
+              @keyup.enter="addStatus"
+            />
             <Button :label="__('Add')" @click="addStatus" />
           </div>
         </template>
-      </Dialog>
+      </Popover>
     </div>
   </div>
 </template>
 <script setup>
-import Dialog from '@/components/frappe-ui/Dialog.vue'
-import Input from '@/components/frappe-ui/Input.vue'
 import { ref } from 'vue'
 const showAddStatus = ref(false)
 const newStatusName = ref('')
