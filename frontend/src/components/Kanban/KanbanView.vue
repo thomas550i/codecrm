@@ -177,11 +177,8 @@ import { call } from 'frappe-ui'
 // Helper to insert new status in linked doctype if status field is Link
 async function insertLinkedStatusIfNeeded(newStatus) {
   // Get doctype and status field from Kanban settings
-  let doctype = kanban.value?.data?.doctype;
-  if (!doctype) {
-    // Try fallback from props or other context if available
-    doctype = props.options?.doctype || '';
-  }
+  // Get doctype from parent props, status field from kanban settings
+  const doctype = props.options?.doctype;
   const statusField = kanban.value?.data?.column_field;
   if (!doctype || !statusField) return;
   // Get field meta from backend
@@ -205,7 +202,7 @@ async function insertLinkedStatusIfNeeded(newStatus) {
 // Helper to sync doctype status field with Kanban
 async function syncDoctypeStatusField() {
   // Get doctype and status field from Kanban settings
-  const doctype = kanban.value?.data?.doctype;
+  const doctype = props.options?.doctype;
   const statusField = kanban.value?.data?.column_field;
   // Get all status names from Kanban columns
   const statusList = kanban.value?.data?.data?.map(col => col.column.name) || [];
