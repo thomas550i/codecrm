@@ -1,95 +1,78 @@
 <template>
-  <div>
-    <pre class="text-xs text-gray-400">{{ activities }}</pre>
-    <div v-if="!activities || activities.length === 0" class="text-center text-gray-500 py-8">
-      No emails found.
-    </div>
-    <div v-else>
-      <div v-for="(activity, idx) in activities" :key="activity.id || idx" class="mb-2">
-        <div
-          class="cursor-pointer flex flex-col rounded-md shadow bg-surface-cards px-3 py-1.5 text-base transition-all duration-300 ease-in-out"
-        >
-          <div
-            class="-mb-0.5 flex items-center justify-between gap-2 truncate text-ink-gray-9"
-            @click="toggle(idx)"
-          >
-            <div class="flex items-center gap-2 truncate">
-              <span>{{ activity.data.sender_full_name }}</span>
-              <span class="sm:flex hidden text-sm text-ink-gray-5">
-                {{ '<' + activity.data.sender + '>' }}
-              </span>
-              <Badge
-                v-if="activity.communication_type == 'Automated Message'"
-                :label="__('Notification')"
-                variant="subtle"
-                theme="green"
-              />
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-              <Badge
-                v-if="getStatus(activity).label"
-                :label="__(getStatus(activity).label)"
-                variant="subtle"
-                :theme="getStatus(activity).color"
-              />
-              <Tooltip :text="formatDate(activity.communication_date)">
-                <div class="text-sm text-ink-gray-5">
-                  {{ __(timeAgo(activity.communication_date)) }}
-                </div>
-              </Tooltip>
-              <div class="flex gap-0.5">
-                <Button
-                  :tooltip="__('Reply')"
-                  variant="ghost"
-                  class="text-ink-gray-7"
-                  :icon="ReplyIcon"
-                  @click.stop="reply(activity.data)"
-                />
-                <Button
-                  :tooltip="__('Reply All')"
-                  variant="ghost"
-                  :icon="ReplyAllIcon"
-                  class="text-ink-gray-7"
-                  @click.stop="reply(activity.data, true)"
-                />
-              </div>
-              <span class="ml-2">
-                <svg v-if="openIdx === idx" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg>
-                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-              </span>
-            </div>
+  <div
+    class="cursor-pointer flex flex-col rounded-md shadow bg-surface-cards px-3 py-1.5 text-base transition-all duration-300 ease-in-out"
+  >
+    <div
+      class="-mb-0.5 flex items-center justify-between gap-2 truncate text-ink-gray-9"
+    >
+      <div class="flex items-center gap-2 truncate">
+        <span>{{ activity.data.sender_full_name }}</span>
+        <span class="sm:flex hidden text-sm text-ink-gray-5">
+          {{ '<' + activity.data.sender + '>' }}
+        </span>
+        <Badge
+          v-if="activity.communication_type == 'Automated Message'"
+          :label="__('Notification')"
+          variant="subtle"
+          theme="green"
+        />
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <Badge
+          v-if="status.label"
+          :label="__(status.label)"
+          variant="subtle"
+          :theme="status.color"
+        />
+        <Tooltip :text="formatDate(activity.communication_date)">
+          <div class="text-sm text-ink-gray-5">
+            {{ __(timeAgo(activity.communication_date)) }}
           </div>
-          <transition name="fade">
-            <div v-show="openIdx === idx" class="flex flex-col gap-1 text-base leading-5 text-ink-gray-8">
-              <div>{{ activity.data.subject }}</div>
-              <div>
-                <span class="mr-1 text-ink-gray-5"> {{ __('To') }}: </span>
-                <span>{{ activity.data.recipients }}</span>
-                <span v-if="activity.data.cc">, </span>
-                <span v-if="activity.data.cc" class="mr-1 text-ink-gray-5">
-                  {{ __('CC') }}:
-                </span>
-                <span v-if="activity.data.cc">{{ activity.data.cc }}</span>
-                <span v-if="activity.data.bcc">, </span>
-                <span v-if="activity.data.bcc" class="mr-1 text-ink-gray-5">
-                  {{ __('BCC') }}:
-                </span>
-                <span v-if="activity.data.bcc">{{ activity.data.bcc }}</span>
-              </div>
-              <div class="border-0 border-t mt-3 mb-1 border-outline-gray-modals" />
-              <EmailContent :content="activity.data.content" />
-              <div v-if="activity.data?.attachments?.length" class="flex flex-wrap gap-2">
-                <AttachmentItem
-                  v-for="a in activity.data.attachments"
-                  :key="a.file_url"
-                  :label="a.file_name"
-                  :url="a.file_url"
-                />
-              </div>
-            </div>
-          </transition>
+        </Tooltip>
+        <div class="flex gap-0.5">
+          <Button
+            :tooltip="__('Reply')"
+            variant="ghost"
+            class="text-ink-gray-7"
+            :icon="ReplyIcon"
+            @click="reply(activity.data)"
+          />
+          <Button
+            :tooltip="__('Reply All')"
+            variant="ghost"
+            :icon="ReplyAllIcon"
+            class="text-ink-gray-7"
+            @click="reply(activity.data, true)"
+          />
         </div>
       </div>
+    </div>
+    <div class="flex flex-col gap-1 text-base leading-5 text-ink-gray-8">
+      <div>{{ activity.data.subject }}</div>
+      <div>
+        <span class="mr-1 text-ink-gray-5"> {{ __('To') }}: </span>
+        <span>{{ activity.data.recipients }}</span>
+        <span v-if="activity.data.cc">, </span>
+        <span v-if="activity.data.cc" class="mr-1 text-ink-gray-5">
+          {{ __('CC') }}:
+        </span>
+        <span v-if="activity.data.cc">{{ activity.data.cc }}</span>
+        <span v-if="activity.data.bcc">, </span>
+        <span v-if="activity.data.bcc" class="mr-1 text-ink-gray-5">
+          {{ __('BCC') }}:
+        </span>
+        <span v-if="activity.data.bcc">{{ activity.data.bcc }}</span>
+      </div>
+    </div>
+    <div class="border-0 border-t mt-3 mb-1 border-outline-gray-modals" />
+    <EmailContent :content="activity.data.content" />
+    <div v-if="activity.data?.attachments?.length" class="flex flex-wrap gap-2">
+      <AttachmentItem
+        v-for="a in activity.data.attachments"
+        :key="a.file_url"
+        :label="a.file_name"
+        :url="a.file_url"
+      />
     </div>
   </div>
 </template>
@@ -100,18 +83,12 @@ import AttachmentItem from '@/components/AttachmentItem.vue'
 import EmailContent from '@/components/Activities/EmailContent.vue'
 import { Badge, Tooltip } from 'frappe-ui'
 import { timeAgo, formatDate } from '@/utils'
-import { ref } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
-  activities: Array,
+  activity: Object,
   emailBox: Object,
 })
-
-const openIdx = ref(null)
-
-function toggle(idx) {
-  openIdx.value = openIdx.value === idx ? null : idx
-}
 
 function reply(email, reply_all = false) {
   props.emailBox.show = true
@@ -161,18 +138,18 @@ function reply(email, reply_all = false) {
     .run()
 }
 
-function getStatus(activity) {
-  let _status = activity?.data?.delivery_status
+const status = computed(() => {
+  let _status = props.activity?.data?.delivery_status
   let indicator_color = 'red'
-  if (["Sent", "Clicked"].includes(_status)) {
+  if (['Sent', 'Clicked'].includes(_status)) {
     indicator_color = 'green'
-  } else if (["Sending", "Scheduled"].includes(_status)) {
+  } else if (['Sending', 'Scheduled'].includes(_status)) {
     indicator_color = 'orange'
-  } else if (["Opened", "Read"].includes(_status)) {
+  } else if (['Opened', 'Read'].includes(_status)) {
     indicator_color = 'blue'
   } else if (_status == 'Error') {
     indicator_color = 'red'
   }
   return { label: _status, color: indicator_color }
-}
+})
 </script>
