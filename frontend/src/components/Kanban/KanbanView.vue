@@ -193,8 +193,7 @@ async function insertLinkedStatusIfNeeded(newStatus) {
       await call('frappe.client.insert', {
         doc: {
           doctype: linkedDoctype,
-          status: newStatus,
-          name: newStatus,
+          status: newStatus
         },
       });
   } else {
