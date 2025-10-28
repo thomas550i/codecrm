@@ -258,7 +258,7 @@ function applyColumnFilter(column) {
   if (filterPopover.value.value) {
     columnFilters.value[column.key] = filterPopover.value.value
     list.value.params.filters = list.value.params.filters || {}
-    list.value.params.filters[column.key] = ['like', filterPopover.value.value]
+    list.value.params.filters[column.key] = ['Like', '%' + filterPopover.value.value + '%']
     list.value.fetch()
   }
   filterPopover.value = { open: false, columnKey: null, value: '' }

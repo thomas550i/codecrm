@@ -175,4 +175,42 @@ function getStatus(activity) {
   }
   return { label: _status, color: indicator_color }
 }
+
+// Utility function to map API response to activities format
+export function mapCommunicationsToActivities(docinfo, message) {
+  // Prefer docinfo.communications if available
+  if (docinfo && Array.isArray(docinfo.communications)) {
+    return docinfo.communications.map(comm => ({
+      data: {
+        subject: comm.subject || comm.data?.subject,
+        content: comm.content || comm.data?.content,
+        sender_full_name: comm.sender_full_name || comm.data?.sender_full_name,
+        sender: comm.sender || comm.data?.sender,
+        recipients: comm.recipients || comm.data?.recipients,
+        cc: comm.cc || comm.data?.cc,
+        bcc: comm.bcc || comm.data?.bcc,
+        attachments: comm.attachments ? (typeof comm.attachments === 'string' ? JSON.parse(comm.attachments) : comm.attachments) : [],
+        delivery_status: comm.delivery_status || comm.data?.delivery_status,
+        communication_date: comm.communication_date || comm.data?.communication_date,
+      }
+    }));
+  }
+  // Fallback to message array if needed
+  if (Array.isArray(message)) {
+    return message.flat().filter(m => m.activity_type === 'communication').map(m => ({
+      data: {
+        ...m.data,
+        communication_date: m.communication_date,
+      }
+    }));
+  }
+  return [];
+}
+
+/*
+// Example usage in parent component:
+import { mapCommunicationsToActivities } from './Activities/EmailArea.vue';
+const activities = mapCommunicationsToActivities(apiResponse.docinfo, apiResponse.message);
+// Pass activities to <EmailArea :activities="activities" ... />
+*/
 </script>
