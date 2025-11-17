@@ -122,6 +122,28 @@ router.beforeEach(async (to, from, next) => {
 
   isLoggedIn && (await userResource.promise)
 
+  // If userResource didn't include roles, fetch users and populate roles as a fallback
+  try {
+    const userRolesPresent = Array.isArray(userResource.data?.roles) && userResource.data.roles.length > 0
+    if (isLoggedIn && !userRolesPresent) {
+      const session = sessionStore()
+      const sessionUser = session.user
+      console.log('[CRM DEBUG] userResource.roles missing, fetching crm.api.session.get_users as fallback')
+      const res = await (await import('frappe-ui')).call('crm.api.session.get_users')
+      // res is expected to be [users, crm_users]
+      const users = res?.[0] || res?.users || []
+      const found = users.find((u) => u.name === sessionUser || u.email === sessionUser)
+      if (found) {
+        // assign roles onto userResource.data for downstream checks
+        if (!userResource.data) userResource.data = {}
+        userResource.data.roles = found.roles || []
+        console.log('[CRM DEBUG] Fallback roles set from get_users:', userResource.data.roles)
+      }
+    }
+  } catch (err) {
+    console.warn('[CRM DEBUG] fallback role fetch failed', err)
+  }
+
   if (to.name === 'Home' && isLoggedIn) {
     const { views, getDefaultView } = viewsStore()
     await views.promise
