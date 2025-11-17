@@ -244,7 +244,10 @@ const newStatusName = ref('')
 
 
 function addStatusToKanban(statusName) {
-  kanban.value.data.data.push({
+  console.log('addStatusToKanban called with:', statusName);
+  console.log('addStatusToKanban: kanban.value.data.data before push:', kanban.value.data.data);
+  
+  const newColumn = {
     column: {
       name: statusName,
       color: colors[kanban.value.data.data.length % colors.length],
@@ -255,7 +258,12 @@ function addStatusToKanban(statusName) {
     },
     data: [],
     fields: [],
-  });
+  };
+  
+  console.log('addStatusToKanban: pushing new column:', newColumn);
+  kanban.value.data.data.push(newColumn);
+  console.log('addStatusToKanban: kanban.value.data.data after push:', kanban.value.data.data);
+  
   updateColumn();
   syncDoctypeStatusField();
 }
@@ -266,11 +274,11 @@ async function addStatus() {
   if (!newStatusName.value.trim()) return;
   const doctype = props.options?.doctype;
   let insertSuccess = true;
+  let insertRes = null;
   if (doctype === 'CRM Deal') {
-    // Hardcoded insert API call for CRM Deal
     const newDealStatus = newStatusName.value.trim();
     try {
-      const res = await call('frappe.client.insert', {
+      insertRes = await call('frappe.client.insert', {
         doc: {
           doctype: 'CRM Deal Status',
           type: 'Open',
@@ -278,49 +286,57 @@ async function addStatus() {
           deal_status: newDealStatus,
         }
       });
-      insertSuccess = !!(res && res.message);
+      insertSuccess = !!(insertRes && insertRes.message);
     } catch (err) {
       insertSuccess = false;
       console.error('Insert failed:', err);
     }
-  }
-
-   if (doctype === 'CRM Lead') {
-    // Hardcoded insert API call for CRM Deal
-    const newDealStatus = newStatusName.value.trim();
+  } else if (doctype === 'CRM Lead') {
+    const newLeadStatus = newStatusName.value.trim();
     try {
-      const res = await call('frappe.client.insert', {
+      insertRes = await call('frappe.client.insert', {
         doc: {
           doctype: 'CRM Lead Status',
           color: 'gray',
-          lead_status: newDealStatus,
+          lead_status: newLeadStatus,
         }
       });
-      insertSuccess = !!(res && res.message);
+      insertSuccess = !!(insertRes && insertRes.message);
     } catch (err) {
       insertSuccess = false;
       console.error('Insert failed:', err);
     }
   }
 
-
+  console.log('addStatus: insertSuccess:', insertSuccess, 'insertRes:', insertRes);
+  console.log('addStatus: kanban.value before push:', kanban.value);
+  
   if (insertSuccess) {
-    kanban.value.data.data.push({
-      column: {
-        name: newStatusName.value,
-        color: colors[kanban.value.data.data.length % colors.length],
-        order: [],
-        all_count: 0,
-        count: 0,
-        delete: false,
-      },
-      data: [],
-      fields: [],
-    });
+    // Prefer the label returned by the API (deal_status / lead_status / name), fallback to input
+    const msg = insertRes?.message || {};
+    const statusLabel = msg.deal_status || msg.lead_status || msg.name || newStatusName.value;
+    console.log('addStatus: extracted statusLabel:', statusLabel);
+    
+    // Ensure kanban.value.data.data exists
+    if (!kanban.value?.data?.data) {
+      console.error('addStatus: kanban.value.data.data is undefined!');
+      return;
+    }
+    
+    addStatusToKanban(statusLabel);
+    console.log('addStatus: kanban.value after push:', kanban.value);
     newStatusName.value = '';
     showAddStatus.value = false;
-    updateColumn();
-    syncDoctypeStatusField();
+  } else if (!doctype || (doctype !== 'CRM Deal' && doctype !== 'CRM Lead')) {
+    // If doctype isn't CRM Deal/Lead, add locally without API
+    console.log('addStatus: fallback mode for doctype:', doctype);
+    if (!kanban.value?.data?.data) {
+      console.error('addStatus: kanban.value.data.data is undefined!');
+      return;
+    }
+    addStatusToKanban(newStatusName.value);
+    newStatusName.value = '';
+    showAddStatus.value = false;
   }
 }
 const props = defineProps({
