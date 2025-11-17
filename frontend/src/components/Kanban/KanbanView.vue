@@ -286,7 +286,8 @@ async function addStatus() {
           deal_status: newDealStatus,
         }
       });
-      insertSuccess = !!(insertRes && insertRes.message);
+      // frappe-ui call returns data directly, not wrapped in {message: ...}
+      insertSuccess = !!(insertRes && insertRes.name);
     } catch (err) {
       insertSuccess = false;
       console.error('Insert failed:', err);
@@ -301,7 +302,8 @@ async function addStatus() {
           lead_status: newLeadStatus,
         }
       });
-      insertSuccess = !!(insertRes && insertRes.message);
+      // frappe-ui call returns data directly, not wrapped in {message: ...}
+      insertSuccess = !!(insertRes && insertRes.name);
     } catch (err) {
       insertSuccess = false;
       console.error('Insert failed:', err);
@@ -313,8 +315,8 @@ async function addStatus() {
   
   if (insertSuccess) {
     // Prefer the label returned by the API (deal_status / lead_status / name), fallback to input
-    const msg = insertRes?.message || {};
-    const statusLabel = msg.deal_status || msg.lead_status || msg.name || newStatusName.value;
+    // insertRes is the doc directly (not wrapped in {message: ...})
+    const statusLabel = insertRes.deal_status || insertRes.lead_status || insertRes.name || newStatusName.value;
     console.log('addStatus: extracted statusLabel:', statusLabel);
     
     // Ensure kanban.value.data.data exists
