@@ -116,6 +116,16 @@ def get_customer_link(crm_deal):
 			)
 			frappe.throw(_("Error while fetching customer in ERPNext, check error log for more details"))
 
+@frappe.whitelist()
+def get_supplier_quotation_url(crm_deal, organization):
+    # create a new RFQ draft
+    doc = frappe.new_doc("Request for Quotation")
+    doc.opportunity_id = crm_deal
+    doc.flags.ignore_mandatory = True  # bypass suppliers/items requirement
+    doc.insert(ignore_permissions=True)
+
+    # return permanent link
+    return f"/app/request-for-quotation/{doc.name}"
 
 @frappe.whitelist()
 def get_quotation_url(crm_deal, organization):
