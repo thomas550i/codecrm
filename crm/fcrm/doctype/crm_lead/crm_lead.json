@@ -18,6 +18,18 @@
   "job_title",
   "source",
   "lead_owner",
+  "type",
+  "country",
+  "state",
+  "city",
+  "block",
+  "street",
+  "location_in_arabic",
+  "enquiry",
+  "resume",
+  "apply_for",
+  "category",
+  "reference",
   "person_tab",
   "salutation",
   "first_name",
@@ -31,12 +43,17 @@
   "middle_name",
   "gender",
   "phone",
+  "vastech_sales_person",
+  "external_sales_person",
   "column_break_dbsv",
   "status",
   "no_of_employees",
   "annual_revenue",
   "image",
   "converted",
+  "location_link",
+  "tax_id",
+  "emirates_id",
   "products_tab",
   "products",
   "section_break_ggwh",
@@ -74,8 +91,7 @@
   {
    "fieldname": "first_name",
    "fieldtype": "Data",
-   "label": "First Name",
-   "reqd": 1
+   "label": "First Name"
   },
   {
    "fieldname": "middle_name",
@@ -119,7 +135,10 @@
    "fieldname": "mobile_no",
    "fieldtype": "Data",
    "label": "Mobile No",
-   "options": "Phone"
+   "no_copy": 1,
+   "options": "Phone",
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "phone",
@@ -153,6 +172,7 @@
    "options": "User"
   },
   {
+   "default": "Website",
    "fieldname": "source",
    "fieldtype": "Link",
    "label": "Source",
@@ -325,13 +345,108 @@
    "label": "Net Total",
    "options": "currency",
    "read_only": 1
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Link",
+   "label": "State",
+   "options": "State"
+  },
+  {
+   "default": "Individual",
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Individual\nCompany"
+  },
+  {
+   "default": "United Arab Emirates",
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Link",
+   "label": "City",
+   "options": "City"
+  },
+  {
+   "fieldname": "block",
+   "fieldtype": "Data",
+   "label": "Block"
+  },
+  {
+   "fieldname": "street",
+   "fieldtype": "Data",
+   "label": "Street"
+  },
+  {
+   "fieldname": "location_in_arabic",
+   "fieldtype": "Data",
+   "label": "Location in arabic"
+  },
+  {
+   "fieldname": "enquiry",
+   "fieldtype": "Small Text",
+   "label": "Enquiry"
+  },
+  {
+   "fieldname": "resume",
+   "fieldtype": "Attach",
+   "label": "Resume"
+  },
+  {
+   "fieldname": "apply_for",
+   "fieldtype": "Select",
+   "label": "Apply For",
+   "options": "Doctor\nNurse\nPharmacist\nOthers"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "label": "Category",
+   "options": "CRM Category"
+  },
+  {
+   "fieldname": "reference",
+   "fieldtype": "Data",
+   "label": "Reference"
+  },
+  {
+   "fieldname": "vastech_sales_person",
+   "fieldtype": "Link",
+   "label": "Vastech Sales Person",
+   "options": "Sales Person"
+  },
+  {
+   "fieldname": "external_sales_person",
+   "fieldtype": "Link",
+   "label": "External Sales Person",
+   "options": "Sales Partner"
+  },
+  {
+   "fieldname": "location_link",
+   "fieldtype": "Data",
+   "label": "Location Link"
+  },
+  {
+   "fieldname": "tax_id",
+   "fieldtype": "Data",
+   "label": "Tax Id"
+  },
+  {
+   "fieldname": "emirates_id",
+   "fieldtype": "Data",
+   "label": "Emirates ID"
   }
  ],
  "grid_page_length": 50,
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-14 19:51:06.184569",
+ "modified": "2026-02-05 17:39:39.216647",
  "modified_by": "Administrator",
  "module": "FCRM",
  "name": "CRM Lead",
