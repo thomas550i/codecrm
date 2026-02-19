@@ -36,7 +36,7 @@
       >
         <RouterLink
           v-for="n in notifications.data"
-          :key="n.comment"
+          :key="n.creation"
           :to="getRoute(n)"
           class="flex cursor-pointer items-start gap-2.5 px-4 py-2.5 hover:bg-surface-gray-2"
           :style="n.read ? '' : 'background: #fff7f7;'"
@@ -96,9 +96,11 @@ import { timeAgo } from '@/utils'
 import { onClickOutside } from '@vueuse/core'
 import { capture } from '@/telemetry'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 
 const { $socket } = globalStore()
 const { mark_as_read, toggle, mark_doc_as_read } = notificationsStore()
+const router = useRouter()
 
 const target = ref(null)
 onClickOutside(
@@ -121,13 +123,73 @@ function markAllAsRead() {
   mark_as_read.reload()
 }
 
+// Request browser notification permission
+async function requestNotificationPermission() {
+  if (!('Notification' in window)) {
+    console.log('This browser does not support notifications')
+    return false
+  }
+
+  if (Notification.permission === 'granted') {
+    return true
+  }
+
+  if (Notification.permission !== 'denied') {
+    const permission = await Notification.requestPermission()
+    return permission === 'granted'
+  }
+
+  return false
+}
+
+// Show browser notification
+function showBrowserNotification(notification) {
+  if (!notification || Notification.permission !== 'granted') return
+
+  // Extract text from HTML notification_text
+  const tempDiv = document.createElement('div')
+  tempDiv.innerHTML = notification.notification_text || ''
+  const notificationText = tempDiv.textContent || tempDiv.innerText || 'New notification'
+
+  const browserNotification = new Notification('CRM Notification', {
+    body: notificationText.trim(),
+    icon: '/favicon.ico',
+    badge: '/favicon.ico',
+    tag: notification.notification_type_doc || 'crm-notification',
+    requireInteraction: false,
+    silent: false,
+  })
+
+  // Handle notification click
+  browserNotification.onclick = () => {
+    window.focus()
+    router.push(getRoute(notification))
+    markAsRead(notification.comment || notification.notification_type_doc)
+    browserNotification.close()
+  }
+
+  // Auto close after 10 seconds
+  setTimeout(() => {
+    browserNotification.close()
+  }, 10000)
+}
+
 onBeforeUnmount(() => {
   $socket.off('crm_notification')
 })
 
 onMounted(() => {
+  // Request notification permission on mount
+  requestNotificationPermission()
+
   $socket.on('crm_notification', () => {
-    notifications.reload()
+    notifications.reload().then(() => {
+      // Show browser notification for the latest unread notification
+      const latestNotification = notifications.data?.find(n => !n.read)
+      if (latestNotification) {
+        showBrowserNotification(latestNotification)
+      }
+    })
   })
 })
 
