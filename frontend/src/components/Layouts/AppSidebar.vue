@@ -7,6 +7,7 @@
       <UserDropdown :isCollapsed="isSidebarCollapsed" />
     </div>
     <div class="flex-1 overflow-y-auto">
+      <DynamicMenu />
       <div class="mb-3 flex flex-col">
         <SidebarLink
           id="notifications-btn"
@@ -193,6 +194,7 @@ import { capture } from '@/telemetry'
 import router from '@/router'
 import { useStorage } from '@vueuse/core'
 import { ref, reactive, computed, h, markRaw, onMounted } from 'vue'
+import DynamicMenu from '@/components/DynamicMenu.vue'
 
 const { getPinnedViews, getPublicViews } = viewsStore()
 const { toggle: toggleNotificationPanel } = notificationsStore()

@@ -9,6 +9,12 @@ const routes = [
     name: 'Home',
   },
   {
+    path: '/doctype/:doctypeName',
+    name: 'DoctypeListForm',
+    component: () => import('@/pages/DoctypeListForm.vue'),
+    props: true,
+  },
+  {
     path: '/notifications',
     name: 'Notifications',
     component: () => import('@/pages/MobileNotification.vue'),
