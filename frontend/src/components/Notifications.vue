@@ -34,10 +34,11 @@
         v-if="notifications.data?.length"
         class="divide-y divide-outline-gray-modals overflow-auto text-base"
       >
-        <RouterLink
+        <component
           v-for="n in notifications.data"
           :key="n.creation"
-          :to="getRoute(n)"
+          :is="n.reference_name ? 'RouterLink' : 'div'"
+          :to="n.reference_name ? getRoute(n) : undefined"
           class="flex cursor-pointer items-start gap-2.5 px-4 py-2.5 hover:bg-surface-gray-2"
           :style="n.read ? '' : 'background: #fff7f7;'"
           @click="markAsRead(n.comment || n.notification_type_doc)"
@@ -67,7 +68,7 @@
               {{ __(timeAgo(n.creation)) }}
             </div>
           </div>
-        </RouterLink>
+        </component>
       </div>
       <div
         v-else
