@@ -100,15 +100,17 @@ const valuePropPassed = computed(() => 'value' in attrs)
 const value = computed({
   get: () => (valuePropPassed.value ? attrs.value : props.modelValue),
   set: (val) => {
-    return (
-      val?.value &&
-      emit(valuePropPassed.value ? 'change' : 'update:modelValue', val?.value)
-    )
+    if (val?.value) {
+      // Store the label when a value is selected
+      selectedLabel.value = val.label || val.value
+      emit(valuePropPassed.value ? 'change' : 'update:modelValue', val.value)
+    }
   },
 })
 
 const autocomplete = ref(null)
 const text = ref('')
+const selectedLabel = ref('')
 
 watchDebounced(
   () => autocomplete.value?.query,
@@ -127,6 +129,49 @@ watchDebounced(
   { debounce: 300, immediate: true },
 )
 
+// Watch for value changes and fetch the label if needed
+watchDebounced(
+  () => value.value,
+  (newValue) => {
+    if (newValue && typeof newValue === 'string') {
+      // Check if we already have this value in options
+      const existingOption = options.data?.find(opt => opt.value === newValue)
+      if (existingOption) {
+        selectedLabel.value = existingOption.label
+      } else if (props.doctype && newValue !== '@me') {
+        // Fetch the label for this value
+        fetchValueLabel(newValue)
+      }
+    } else if (!newValue) {
+      selectedLabel.value = ''
+    }
+  },
+  { debounce: 100, immediate: true },
+)
+
+const labelResource = createResource({
+  url: 'frappe.desk.search.search_link',
+  method: 'POST',
+  auto: false,
+  onSuccess: (data) => {
+    if (data && data.length > 0) {
+      selectedLabel.value = data[0].label || data[0].value
+    }
+  },
+})
+
+function fetchValueLabel(val) {
+  if (!val || !props.doctype) return
+  labelResource.update({
+    params: {
+      txt: val,
+      doctype: props.doctype,
+      filters: props.filters,
+    },
+  })
+  labelResource.fetch()
+}
+
 const options = createResource({
   url: 'frappe.desk.search.search_link',
   cache: [props.doctype, text.value, props.hideMe, props.filters],
@@ -144,6 +189,18 @@ const options = createResource({
         description: option.description,
       }
     })
+    
+    // If we have a selected value, ensure it's in the options with its label
+    if (value.value && typeof value.value === 'string') {
+      const hasSelected = allData.some(opt => opt.value === value.value)
+      if (!hasSelected && selectedLabel.value) {
+        allData.unshift({
+          label: selectedLabel.value,
+          value: value.value,
+        })
+      }
+    }
+    
     if (!props.hideMe && props.doctype == 'User') {
       allData.unshift({
         label: '@me',
@@ -174,6 +231,7 @@ function reload(val) {
 }
 
 function clearValue(close) {
+  selectedLabel.value = ''
   emit(valuePropPassed.value ? 'change' : 'update:modelValue', '')
   close()
 }

@@ -1,23 +1,28 @@
 <template>
   <div v-if="field.visible" class="field">
-    <div v-if="field.fieldtype != 'Check'" class="mb-2 text-sm text-ink-gray-5">
+    <!-- Heading field type - only show bold label -->
+    <div v-if="field.fieldtype === 'Heading'" class="mb-2 text-base font-bold text-ink-gray-9">
       {{ __(field.label) }}
-      <span
-        v-if="
-          field.reqd ||
-          (field.mandatory_depends_on && field.mandatory_via_depends_on)
-        "
-        class="text-ink-red-2"
-        >*</span
-      >
     </div>
-    <FormControl
-      v-if="
-        field.read_only &&
-        !['Int', 'Float', 'Currency', 'Percent', 'Check'].includes(
-          field.fieldtype,
-        )
-      "
+    <template v-else>
+      <div v-if="field.fieldtype != 'Check'" class="mb-2 text-sm text-ink-gray-5">
+        {{ __(field.label) }}
+        <span
+          v-if="
+            field.reqd ||
+            (field.mandatory_depends_on && field.mandatory_via_depends_on)
+          "
+          class="text-ink-red-2"
+          >*</span
+        >
+      </div>
+      <FormControl
+        v-if="
+          field.read_only &&
+          !['Int', 'Float', 'Currency', 'Percent', 'Check'].includes(
+            field.fieldtype,
+          )
+        "
       type="text"
       :placeholder="getPlaceholder(field)"
       v-model="data[field.fieldname]"
@@ -208,6 +213,7 @@
       :description="field.description"
       @change="fieldChange($event.target.value, field)"
     />
+    </template>
   </div>
 </template>
 <script setup>
@@ -312,6 +318,12 @@ const field = computed(() => {
 
 function isFieldVisible(field) {
   if (preview.value) return true
+  
+  // Heading fields are always visible if not hidden and depends_on is met
+  if (field.fieldtype === 'Heading') {
+    return (!field.depends_on || field.display_via_depends_on) && !field.hidden
+  }
+  
   return (
     (field.fieldtype == 'Check' ||
       (field.read_only && data.value[field.fieldname]) ||
